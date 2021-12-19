@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+
+import 'dart:convert' as convert;
+import 'model.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,15 +18,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter ListView Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
       home: MyHomePage(title: 'Flutter ListView Home Page'),
@@ -30,15 +28,6 @@ class MyApp extends StatelessWidget {
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -46,6 +35,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage>{
+
+  // var url = Uri.parse('https://api.github.com/events');
 
   //记录当前底部导航选中了那个
   int _currentIndex = 0;
@@ -59,19 +50,19 @@ class _MyHomePageState extends State<MyHomePage>{
     BottomNavigationBarItem(label: ('我的'),icon: Icon(Icons.perm_contact_cal_outlined) ),
   ];
 
+  void requestData(){
+
+  }
   @override
   void initState() {
     print('初始化了数据！');
     super.initState();
+
+    requestData();
   }
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
     });
   }
 
@@ -112,29 +103,82 @@ class _MyHomePageState extends State<MyHomePage>{
   }
 }
 
-class HomePage extends StatelessWidget
+class HomePage extends StatefulWidget
 {
 
-   @override
+  @override
+  StatefulElement createElement() {
+    // TODO: implement createElement
+    return super.createElement();
+  }
+
+  @override
+  _HomePageStat createState() {
+    // TODO: implement createState
+    return _HomePageStat();
+  }
+
+}
+class _HomePageStat extends State<HomePage> {
+
+  List  elments = List();
+  @override
   Widget build(BuildContext context) {
+
     // TODO: implement build
-   return Container(
-     color: Colors.white,
-     alignment: Alignment.center,
-     child: ListView.separated(
-         itemBuilder: (BuildContext content, int index){
-            return ListTile(title: Text("$index"),);
-        },
-         separatorBuilder: (BuildContext content, int index){
-            return  Divider();
-         },
-         itemCount: 200,
-     ),
-   );
+
+
+    return Container(
+      color: Colors.white,
+      alignment: Alignment.center,
+      child: RefreshIndicator(
+        onRefresh: refresh,
+        child: ListView.separated(
+            itemCount: elments.length,
+            itemBuilder: (BuildContext context, int index){
+              EventModel model = elments[index];
+              ListTile(
+                title: "123",
+                subtitle: "222",
+              );
+              return CustomListViewCell(model.userName, model.repoName, model.url);
+            },
+            separatorBuilder: (BuildContext context, int index){
+              return Divider(color: Colors.grey);
+            },
+        ),
+      ),
+      // child: RefreshIndicator(
+      //   onRefresh: _refresh,
+      //   child: ListView.separated(
+      //     itemCount: elments.length,
+      //     itemBuilder: (BuildContext context, int index){
+      //           EventModel model = elments[index];
+      //           return CustomListViewCell(model.userName, model.repoName, model.url);
+      //       },
+      //       separatorBuilder: (BuildContext context, int index){
+      //          Divider(color: Colors.grey);
+      //       },
+      //   ),
+      // ),
+    );
 
   }
+  Future refresh() async{
+    // final respon = await http.get("https://api.github.com/events");
+    final respon = await DefaultAssetBundle.of(context).loadString("images/data.json");
+    // if(respon.statusCode == 200)
+    // {
+    final json = convert.jsonDecode(respon);
+
+    setState(() {
+      json.forEach((item){
+        elments.add(EventModel(item));
+      });
+    });
+  }
 }
-///
+///我的界面
 class MinePage extends StatelessWidget
 {
 
@@ -155,6 +199,60 @@ class MinePage extends StatelessWidget
     );
 
   }
+}
+
+/// 自定义 ListView 的cell
+class CustomListViewCell extends StatelessWidget{
+
+  CustomListViewCell(this.title, this.subTitle, this.iconUrl)
+  {
+    initUI();
+  }
+
+  final String title;
+  final String subTitle;
+  final String  iconUrl;
+
+  //控件
+  Positioned titileP;
+  Positioned subTitleP;
+  Positioned iconP;
+  
+  //初始化UI
+  void initUI(){
+    titileP =  Positioned(child: Text("$title",style: TextStyle(fontSize: 18,color: Colors.black),),
+      left: 80,
+      top:  20,
+      width: 200,
+      height: 20,
+    );
+    subTitleP = Positioned(child: Text("$subTitle"),
+      left: 80,
+      top:  titileP.top + titileP.height + 10,
+      width: 200,
+      height: 20,
+    );
+    iconP = Positioned(child: Image.network(iconUrl),
+      left: 10,
+      top: 10,
+      width: 60,
+      height: 60,
+    );
+
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Container(
+      height: 80,
+      child: Stack(
+        children: [iconP,titileP,subTitleP],
+      ),
+    );
+  }
+
+
 }
 
 
