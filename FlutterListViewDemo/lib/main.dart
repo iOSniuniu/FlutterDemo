@@ -122,6 +122,7 @@ class HomePage extends StatefulWidget
 class _HomePageStat extends State<HomePage> {
 
   List  elments = List();
+
   @override
   Widget build(BuildContext context) {
 
@@ -137,10 +138,7 @@ class _HomePageStat extends State<HomePage> {
             itemCount: elments.length,
             itemBuilder: (BuildContext context, int index){
               EventModel model = elments[index];
-              ListTile(
-                title: "123",
-                subtitle: "222",
-              );
+
               return CustomListViewCell(model.userName, model.repoName, model.url);
             },
             separatorBuilder: (BuildContext context, int index){
@@ -175,6 +173,10 @@ class _HomePageStat extends State<HomePage> {
       json.forEach((item){
         elments.add(EventModel(item));
       });
+      print("oldE = $elments");
+      var newE = elments.map((e) => e);
+      print("newE = $newE");
+
     });
   }
 }
