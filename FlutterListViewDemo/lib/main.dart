@@ -34,25 +34,24 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage>{
-
+class _MyHomePageState extends State<MyHomePage> {
   // var url = Uri.parse('https://api.github.com/events');
 
   //记录当前底部导航选中了那个
   int _currentIndex = 0;
 
   //页面
-  List pageViews = [HomePage(),MinePage()];
+  List pageViews = [HomePage(), MinePage()];
 
   //底部导航bar
-  List <BottomNavigationBarItem>bottomBarItmes = [
-    BottomNavigationBarItem(label: ('首页'),icon: Icon(Icons.home)),
-    BottomNavigationBarItem(label: ('我的'),icon: Icon(Icons.perm_contact_cal_outlined) ),
+  List<BottomNavigationBarItem> bottomBarItmes = [
+    BottomNavigationBarItem(label: ('首页'), icon: Icon(Icons.home)),
+    BottomNavigationBarItem(
+        label: ('我的'), icon: Icon(Icons.perm_contact_cal_outlined)),
   ];
 
-  void requestData(){
+  void requestData() {}
 
-  }
   @override
   void initState() {
     print('初始化了数据！');
@@ -62,14 +61,11 @@ class _MyHomePageState extends State<MyHomePage>{
   }
 
   void _incrementCounter() {
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -89,23 +85,22 @@ class _MyHomePageState extends State<MyHomePage>{
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
-      bottomNavigationBar:BottomNavigationBar(items: bottomBarItmes,
+      bottomNavigationBar: BottomNavigationBar(
+        items: bottomBarItmes,
         currentIndex: _currentIndex,
-        onTap: (int index){
-        print("index = $index");
+        onTap: (int index) {
+          print("index = $index");
           setState(() {
             _currentIndex = index;
           });
         },
-      ) ,
+      ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
 
-class HomePage extends StatefulWidget
-{
-
+class HomePage extends StatefulWidget {
   @override
   StatefulElement createElement() {
     // TODO: implement createElement
@@ -117,17 +112,14 @@ class HomePage extends StatefulWidget
     // TODO: implement createState
     return _HomePageStat();
   }
-
 }
-class _HomePageStat extends State<HomePage> {
 
-  List  elments = List();
+class _HomePageStat extends State<HomePage> {
+  List elments = List();
 
   @override
   Widget build(BuildContext context) {
-
     // TODO: implement build
-
 
     return Container(
       color: Colors.white,
@@ -135,15 +127,16 @@ class _HomePageStat extends State<HomePage> {
       child: RefreshIndicator(
         onRefresh: refresh,
         child: ListView.separated(
-            itemCount: elments.length,
-            itemBuilder: (BuildContext context, int index){
-              EventModel model = elments[index];
+          itemCount: elments.length,
+          itemBuilder: (BuildContext context, int index) {
+            EventModel model = elments[index];
 
-              return CustomListViewCell(model.userName, model.repoName, model.url);
-            },
-            separatorBuilder: (BuildContext context, int index){
-              return Divider(color: Colors.grey);
-            },
+            return CustomListViewCell(
+                model.userName, model.repoName, model.url);
+          },
+          separatorBuilder: (BuildContext context, int index) {
+            return Divider(color: Colors.grey);
+          },
         ),
       ),
       // child: RefreshIndicator(
@@ -160,101 +153,94 @@ class _HomePageStat extends State<HomePage> {
       //   ),
       // ),
     );
-
   }
-  Future refresh() async{
+
+  Future refresh() async {
     // final respon = await http.get("https://api.github.com/events");
-    final respon = await DefaultAssetBundle.of(context).loadString("images/data.json");
+    final respon =
+        await DefaultAssetBundle.of(context).loadString("images/data.json");
     // if(respon.statusCode == 200)
     // {
     final json = convert.jsonDecode(respon);
 
     setState(() {
-      json.forEach((item){
+      json.forEach((item) {
         elments.add(EventModel(item));
       });
       print("oldE = $elments");
       var newE = elments.map((e) => e);
       print("newE = $newE");
-
     });
   }
 }
-///我的界面
-class MinePage extends StatelessWidget
-{
 
+///我的界面
+class MinePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
     // TODO: implement build
     return Container(
       color: Colors.green,
       alignment: Alignment.center,
       child: Text(
         "我的",
-        style: TextStyle(
-            color: Colors.white,
-            fontSize: 22
-        ),
+        style: TextStyle(color: Colors.white, fontSize: 22),
       ),
     );
-
   }
 }
 
 /// 自定义 ListView 的cell
-class CustomListViewCell extends StatelessWidget{
-
-  CustomListViewCell(this.title, this.subTitle, this.iconUrl)
-  {
+class CustomListViewCell extends StatelessWidget {
+  CustomListViewCell(this.title, this.subTitle, this.iconUrl) {
     initUI();
   }
 
   final String title;
   final String subTitle;
-  final String  iconUrl;
+  final String iconUrl;
 
   //控件
   Positioned titileP;
   Positioned subTitleP;
   Positioned iconP;
-  
+
   //初始化UI
-  void initUI(){
-    titileP =  Positioned(child: Text("$title",style: TextStyle(fontSize: 18,color: Colors.black),),
+  void initUI() {
+    titileP = Positioned(
+      child: Text(
+        "$title",
+        style: TextStyle(fontSize: 18, color: Colors.black),
+      ),
       left: 80,
-      top:  20,
+      top: 20,
       width: 200,
       height: 20,
     );
-    subTitleP = Positioned(child: Text("$subTitle"),
+    subTitleP = Positioned(
+      child: Text("$subTitle"),
       left: 80,
-      top:  titileP.top + titileP.height + 10,
+      top: titileP.top + titileP.height + 10,
       width: 200,
       height: 20,
     );
-    iconP = Positioned(child: Image.network(iconUrl),
+    iconP = Positioned(
+      child: Image.network(iconUrl),
       left: 10,
       top: 10,
       width: 60,
       height: 60,
     );
-
   }
-  
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
       height: 80,
       child: Stack(
-        children: [iconP,titileP,subTitleP],
+        children: [iconP, titileP, subTitleP],
       ),
     );
   }
-
-
 }
-
-
